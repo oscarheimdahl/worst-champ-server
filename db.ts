@@ -25,20 +25,22 @@ async function seedChampions() {
   }
 }
 
+type Champion = { id: string; name: string; votes: number };
 export async function getChampions() {
-  const championsList: Array<{ id: string; name: string; votes: number }> = [];
+  const championsList: Array<Champion> = [];
   for await (const entry of kv.list({ prefix: ['champions'] })) {
-    championsList.push(entry.value);
+    championsList.push(entry.value as Champion);
   }
   return championsList.sort((a, b) => b.votes - a.votes); // Sort by votes descending
 }
 
 export async function upvoteChampion(championId: string) {
-  const champion = await kv.get(['champions', championId]);
-  if (champion.value) {
+  const championData = await kv.get(['champions', championId]);
+  const champion = championData.value as Champion;
+  if (champion) {
     await kv.set(['champions', championId], {
-      ...champion.value,
-      votes: champion.value.votes + 1,
+      ...champion,
+      votes: champion.votes + 1,
     });
   }
 }
