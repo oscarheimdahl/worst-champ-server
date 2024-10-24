@@ -2,7 +2,7 @@ import { champions } from './data/champions.ts';
 
 // import sqlite3 from 'npm:sqlite3';
 // const db = new sqlite3.Database('index.db');
-import { Database } from 'jsr:@db/sqlite@0.12';
+import { Database } from '@db/sqlite';
 const db = new Database('index.db');
 
 let dbInitialized = false;

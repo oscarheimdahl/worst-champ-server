@@ -332,6 +332,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@db/sqlite@0.12",
       "npm:sqlite3@^5.1.7"
     ]
   }

@@ -23,13 +23,13 @@ jobs:
         with:
           deno-version: v2.x
 
-      # - name: Install Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: lts/*
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
 
-      # - name: Install step
-      #   run: 'deno install --allow-scripts'
+      - name: Install step
+        run: 'deno install --allow-scripts'
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
