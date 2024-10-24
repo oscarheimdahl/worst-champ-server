@@ -1,50 +1,44 @@
 import { champions } from './data/champions.ts';
 
-// import sqlite3 from 'npm:sqlite3';
-// const db = new sqlite3.Database('index.db');
-import { Database } from '@db/sqlite';
-const db = new Database('index.db');
-
+// Initialize the KV store
 let dbInitialized = false;
+let kv: Deno.Kv;
 
-export function initDB() {
+export async function initDB() {
   if (dbInitialized) return;
+  kv = await Deno.openKv();
   dbInitialized = true;
 
-  createChampionsTable();
-  seedChampions();
+  await seedChampions();
 }
 
-function createChampionsTable() {
-  db.run(
-    `
-      CREATE TABLE IF NOT EXISTS champions (
-        id TEXT PRIMARY KEY UNIQUE, 
-        name TEXT UNIQUE, 
-        votes INTEGER DEFAULT 0
-      )
-    `
-  );
+async function seedChampions() {
+  for (const champion of champions) {
+    const existingChampion = await kv.get(['champions', champion.id]);
+    if (!existingChampion.value) {
+      await kv.set(['champions', champion.id], {
+        id: champion.id,
+        name: champion.name,
+        votes: 0,
+      });
+    }
+  }
 }
 
-function seedChampions() {
-  const query = `
-    INSERT INTO champions (id, name, votes)
-    VALUES (?, ?, 0)
-    ON CONFLICT (id) DO NOTHING
-  `;
-
-  const stmt = db.prepare(query);
-
-  champions.forEach((champion) => {
-    stmt.run(champion.id, champion.name);
-  });
+export async function getChampions() {
+  const championsList: Array<{ id: string; name: string; votes: number }> = [];
+  for await (const entry of kv.list({ prefix: ['champions'] })) {
+    championsList.push(entry.value);
+  }
+  return championsList.sort((a, b) => b.votes - a.votes); // Sort by votes descending
 }
 
-export function getChampions() {
-  return db.prepare(`SELECT * FROM champions ORDER BY votes DESC`).all();
-}
-
-export function upvoteChampion(championId: string) {
-  db.run(`UPDATE champions SET votes = votes + 1 WHERE id = ?`, championId);
+export async function upvoteChampion(championId: string) {
+  const champion = await kv.get(['champions', championId]);
+  if (champion.value) {
+    await kv.set(['champions', championId], {
+      ...champion.value,
+      votes: champion.value.votes + 1,
+    });
+  }
 }
