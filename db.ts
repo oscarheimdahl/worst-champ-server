@@ -1,6 +1,5 @@
 import { champions } from './data/champions.ts';
 
-// Initialize the KV store
 let dbInitialized = false;
 let kv: Deno.Kv;
 
