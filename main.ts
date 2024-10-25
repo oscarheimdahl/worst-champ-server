@@ -9,8 +9,10 @@ Deno.serve({
 });
 
 function addCorsHeaders(req: Request, response: Response) {
+  return response;
   const allowedOrigins = [
     'http://localhost:3000',
+    'http://localhost:5173',
     'https://worst-champ.vercel.app',
   ];
   const origin = req.headers.get('origin');
@@ -29,12 +31,29 @@ async function mainHandler(req: Request) {
   const url = new URL(req.url);
   const path = url.pathname;
 
-  if (req.method === 'OPTIONS') {
-    return addCorsHeaders(req, new Response(null, { status: 204 }));
+  // if (req.method === 'OPTIONS') {
+  //   return addCorsHeaders(req, new Response(null, { status: 204 }));
+  // }
+
+  console.log(path);
+  if (path === '/') {
+    const file = await Deno.open('public/index.html', { read: true });
+    return addCorsHeaders(req, new Response(file.readable));
   }
 
-  if (path === '/') {
-    return addCorsHeaders(req, new Response('Hello World'));
+  if (path.startsWith('/public')) {
+    const filePath = url.pathname.substring(1);
+    const fileType = filePath.split('.').at(-1)!;
+    console.log(`🔴`);
+    try {
+      const file = await Deno.open(filePath, { read: true });
+      return new Response(file.readable, {
+        headers: { 'content-type': typeToMime(fileType) },
+      });
+    } catch (e) {
+      console.log('404, No such file');
+    }
+    return addCorsHeaders(req, new Response('No such file', { status: 404 }));
   }
 
   if (path === '/api/champions') {
@@ -75,7 +94,6 @@ async function mainHandler(req: Request) {
         );
       } catch (e) {
         console.log(e);
-        console.log(`🔴`);
         return addCorsHeaders(req, new Response('Error', { status: 500 }));
       }
     }
@@ -105,4 +123,27 @@ async function mainHandler(req: Request) {
   }
 
   return addCorsHeaders(req, new Response('Not Found', { status: 404 }));
+}
+
+export function typeToMime(type: string) {
+  switch (type) {
+    case 'html':
+      return 'text/html';
+    case 'js':
+      return 'text/javascript';
+    case 'css':
+      return 'text/css';
+    case 'png':
+      return 'image/png';
+    case 'jpg':
+      return 'image/jpeg';
+    case 'jpeg':
+      return 'image/jpeg';
+    case 'svg':
+      return 'image/svg+xml';
+    case 'ico':
+      return 'image/x-icon';
+    default:
+      return 'text/plain';
+  }
 }
