@@ -43,6 +43,3 @@ jobs:
         with:
           project: 'worst-champ-server'
           entrypoint: 'server/main.ts'
-          include: |
-            server/
-            client/dist/
