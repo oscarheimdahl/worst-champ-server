@@ -36,7 +36,7 @@ jobs:
           cache-dependency-path: client/pnpm-lock.yaml
 
       - name: Build step
-        run: 'cd client && pnpm build'
+        run: 'cd client && pnpm install && pnpm build'
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
