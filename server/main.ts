@@ -36,10 +36,6 @@ async function mainHandler(req: Request) {
   // }
 
   console.log(path);
-  if (path === '/') {
-    const file = await Deno.open('../client/dist/index.html', { read: true });
-    return addCorsHeaders(req, new Response(file.readable));
-  }
 
   if (path === '/api/champions') {
     if (req.method === 'GET') {
@@ -107,10 +103,11 @@ async function mainHandler(req: Request) {
     return response;
   }
 
-  const filePath = url.pathname.substring(1);
+  const filePath =
+    url.pathname === '/' ? 'index.html' : url.pathname.substring(1);
   const fileType = filePath.split('.').at(-1)!;
   try {
-    const file = await Deno.open(`../client/dist/${filePath}`, { read: true });
+    const file = await Deno.open(`./dist/${filePath}`, { read: true });
     return new Response(file.readable, {
       headers: { 'content-type': typeToMime(fileType) },
     });
