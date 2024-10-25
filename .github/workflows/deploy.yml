@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: lts/*
           cache: 'pnpm'
+          cache-dependency-path: client/pnpm-lock.yaml
 
       - name: Build step
         run: 'cd client && pnpm build'
