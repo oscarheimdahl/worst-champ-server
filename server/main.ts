@@ -103,16 +103,17 @@ async function mainHandler(req: Request) {
     return response;
   }
 
-  const filePath =
+  const fileName =
     url.pathname === '/' ? 'index.html' : url.pathname.substring(1);
-  const fileType = filePath.split('.').at(-1)!;
+  const fileType = fileName.split('.').at(-1)!;
+  const filePath = `./dist/${fileName}`;
   try {
-    const file = await Deno.open(`./dist/${filePath}`, { read: true });
+    const file = await Deno.open(filePath, { read: true });
     return new Response(file.readable, {
       headers: { 'content-type': typeToMime(fileType) },
     });
   } catch (e) {
-    console.log('404, No such file');
+    console.log(`${filePath}, No such file`);
   }
 
   return addCorsHeaders(req, new Response('Not Found', { status: 404 }));
