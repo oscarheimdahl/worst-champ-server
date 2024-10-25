@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build --emptyOutDir && cp -r dist ../server/dist",
+    "build": "tsc -b && VITE_USE_SECURE=true vite build --emptyOutDir",
+    "build-local": "tsc -b && vite build --emptyOutDir",
     "lint": "eslint .",
     "preview": "vite preview"
   },

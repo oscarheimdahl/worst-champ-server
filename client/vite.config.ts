@@ -10,8 +10,8 @@ export default defineConfig({
       plugins: [tailwindcss()],
     },
   },
-  // build: {
-  //   outDir: '../public',
-  // },
+  build: {
+    outDir: '../server/dist',
+  },
   base: '/',
 });
