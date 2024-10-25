@@ -4,9 +4,9 @@ const prod = import.meta.env.PROD;
 const baseUrl = window.location.host;
 export const socketUrl = `PROTOCOL://${baseUrl}/socket`.replace(
   'PROTOCOL',
-  prod ? 'ws' : 'ws'
+  prod ? 'wss' : 'ws'
 );
 export const apiUrl = `PROTOCOL://${baseUrl}/api`.replace(
   'PROTOCOL',
-  prod ? 'http' : 'http'
+  prod ? 'https' : 'http'
 );
