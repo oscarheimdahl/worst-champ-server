@@ -106,7 +106,9 @@ async function mainHandler(req: Request) {
   const fileName =
     url.pathname === '/' ? 'index.html' : url.pathname.substring(1);
   const fileType = fileName.split('.').at(-1)!;
-  const filePath = `./dist/${fileName}`;
+  const filePath = url.pathname.startsWith('/imgs')
+    ? fileName
+    : `./dist/${fileName}`;
   try {
     const file = await Deno.open(filePath, { read: true });
     return new Response(file.readable, {
