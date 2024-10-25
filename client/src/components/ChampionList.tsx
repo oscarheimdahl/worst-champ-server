@@ -132,11 +132,7 @@ export const ChampionList = () => {
                 className={
                   'pointer-events-none select-none size-full transition-transform scale-[1.05]'
                 }
-                src={
-                  import.meta.env.PROD
-                    ? `/public/imgs/${champion.name}.jpg`
-                    : `/imgs/${champion.name}.jpg`
-                }
+                src={`/imgs/${champion.name}.jpg`}
               />
             </ChampionButton>
           </Reorder.Item>

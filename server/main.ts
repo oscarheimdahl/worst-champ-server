@@ -37,23 +37,8 @@ async function mainHandler(req: Request) {
 
   console.log(path);
   if (path === '/') {
-    const file = await Deno.open('public/index.html', { read: true });
+    const file = await Deno.open('../client/dist/index.html', { read: true });
     return addCorsHeaders(req, new Response(file.readable));
-  }
-
-  if (path.startsWith('/public')) {
-    const filePath = url.pathname.substring(1);
-    const fileType = filePath.split('.').at(-1)!;
-    console.log(`🔴`);
-    try {
-      const file = await Deno.open(filePath, { read: true });
-      return new Response(file.readable, {
-        headers: { 'content-type': typeToMime(fileType) },
-      });
-    } catch (e) {
-      console.log('404, No such file');
-    }
-    return addCorsHeaders(req, new Response('No such file', { status: 404 }));
   }
 
   if (path === '/api/champions') {
@@ -120,6 +105,17 @@ async function mainHandler(req: Request) {
     };
 
     return response;
+  }
+
+  const filePath = url.pathname.substring(1);
+  const fileType = filePath.split('.').at(-1)!;
+  try {
+    const file = await Deno.open(`../client/dist/${filePath}`, { read: true });
+    return new Response(file.readable, {
+      headers: { 'content-type': typeToMime(fileType) },
+    });
+  } catch (e) {
+    console.log('404, No such file');
   }
 
   return addCorsHeaders(req, new Response('Not Found', { status: 404 }));
