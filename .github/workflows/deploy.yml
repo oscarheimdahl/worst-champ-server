@@ -43,4 +43,4 @@ jobs:
         with:
           project: 'worst-champ-server'
           root: './server/'
-          entrypoint: './main.ts'
+          entrypoint: './server/main.ts'
