@@ -42,5 +42,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: 'worst-champ-server'
-          root: 'server'
+          root: 'server/'
           entrypoint: 'main.ts'
