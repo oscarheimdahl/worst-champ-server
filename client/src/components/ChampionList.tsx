@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Champion } from '../App';
 import { ChampionButton } from './ChampionButton';
 import { apiUrl, socketUrl } from '../utils/env';
+import { useCustomToast } from './useCustomToast';
 
 async function upvoteChampion(championId: string, clientId: string) {
   const res = await fetch(`${apiUrl}/champions/vote`, {
@@ -30,6 +31,7 @@ export const ChampionList = () => {
   // const [preventVoteClick, setPreventVoteClick] = useState(false);
 
   const [champions, setChampions] = useState<Champion[]>([]);
+  const customToast = useCustomToast();
 
   useEffect(() => {
     const doFetch = async () => {

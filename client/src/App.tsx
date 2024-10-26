@@ -11,15 +11,11 @@ export type Champion = {
 export default function App() {
   const customToast = useCustomToast();
   useEffect(() => {
-    const welcomed = localStorage.getItem('welcome');
-    if (welcomed) return;
-    localStorage.setItem('welcome', 'true');
     customToast(
       <div className='text-left pb-2 flex flex-col '>
         <span className='text-gray-400 italic relative bottom-2'>Welcome!</span>
         <span> Vote for the worst champion in</span>
         <span className='text-amber-400 pb-2'>
-          {' '}
           League&nbsp;of&nbsp;Legends.
         </span>
         <span>You can vote as many times as you want :)</span>
