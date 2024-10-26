@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { upgradeWebSocket } from 'hono/deno';
 import { cors } from 'hono/cors';
 import { champions } from './data/champions.ts';
 import { getChampions, initDB, upvoteChampion } from './db.ts';
@@ -8,7 +9,19 @@ initDB();
 const sockets = new Map<string, WebSocket>();
 
 const app = new Hono();
-Deno.serve({ port: 8787 }, app.fetch);
+
+app.get(
+  '/socket',
+  upgradeWebSocket((c) => {
+    const socketId = crypto.randomUUID();
+    return {
+      onOpen: (_, ws) => {
+        if (ws.raw) sockets.set(socketId, ws.raw);
+      },
+      onClose: () => sockets.delete(socketId),
+    };
+  })
+);
 
 app.use(
   '*',
@@ -20,6 +33,7 @@ app.use(
 );
 
 app.get('/api/champions', async (c) => {
+  console.log(`🔴`);
   const championsData = await getChampions();
   return c.json(championsData);
 });
@@ -50,37 +64,30 @@ app.post('/api/champions/vote', async (c) => {
   }
 });
 
-app.get('/socket', (c) => {
-  if (c.req.header('upgrade') !== 'websocket') {
-    return c.text('Endpoint for websockets only', 400);
-  }
-
-  const { response, socket } = Deno.upgradeWebSocket(c.req.raw);
-  const socketId = crypto.randomUUID();
-
-  socket.onopen = () => sockets.set(socketId, socket);
-  socket.onclose = () => sockets.delete(socketId);
-
-  return response;
-});
-
-app.get('/:file', async (c) => {
-  const fileName = c.req.param('file') || 'index.html';
+app.on('GET', ['/', '/*'], async (c) => {
+  const requestedFile = new URL(c.req.url).pathname;
+  const fileName =
+    requestedFile === '/' ? 'index.html' : requestedFile.substring(1);
   const fileType = fileName.split('.').pop()!;
   const filePath = fileName.startsWith('imgs/')
     ? fileName
     : `./dist/${fileName}`;
 
+  console.log(fileName, fileType, filePath);
+
   try {
     const file = await Deno.open(filePath, { read: true });
+    const mime = typeToMime(fileType);
     return new Response(file.readable, {
-      headers: { 'Content-Type': typeToMime(fileType) },
+      headers: { 'Content-Type': mime },
     });
   } catch (e) {
     console.error(`${filePath}, No such file`);
     return c.text('Not Found', 404);
   }
 });
+
+Deno.serve({ port: 8000 }, app.fetch);
 
 // Function to map file types to MIME types
 function typeToMime(type: string): string {
