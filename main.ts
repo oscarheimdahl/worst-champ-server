@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { upgradeWebSocket } from 'hono/deno';
+import { getConnInfo, upgradeWebSocket } from 'hono/deno';
 import { cors } from 'hono/cors';
 import { champions } from './data/champions.ts';
 import { getChampions, initDB, upvoteChampion } from './db.ts';
@@ -13,7 +13,7 @@ Deno.serve({ port: 8000 }, app.fetch);
 
 app.get(
   '/socket',
-  upgradeWebSocket((c) => {
+  upgradeWebSocket(() => {
     const socketId = crypto.randomUUID();
     return {
       onOpen: (_, ws) => {
@@ -37,10 +37,13 @@ app.get('/api/champions', async (c) => {
   const championsData = await getChampions();
   return c.json(championsData);
 });
-
 app.post('/api/champions/vote', async (c) => {
   const { championId, clientId } = await c.req.json();
   const champion = champions.find((item) => item.id === championId);
+  //get ip
+  const ip = c.req.header('x-forwarded-for');
+
+  console.log(ip);
 
   if (!champion) {
     return c.text('Bad champion name', 400);
@@ -65,6 +68,11 @@ app.post('/api/champions/vote', async (c) => {
 });
 
 app.on('GET', ['/', '/*'], async (c) => {
+  const info = getConnInfo(c); // info is `ConnInfo`
+
+  console.log(`🔴`);
+  console.log({ info });
+
   const requestedFile = new URL(c.req.url).pathname;
   const fileName =
     requestedFile === '/' ? 'index.html' : requestedFile.substring(1);
