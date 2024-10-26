@@ -1,127 +1,94 @@
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { champions } from './data/champions.ts';
 import { getChampions, initDB, upvoteChampion } from './db.ts';
 
 initDB();
 
-Deno.serve({
-  port: 8000,
-  handler: mainHandler,
-});
-
-function addCorsHeaders(req: Request, response: Response) {
-  return response;
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'https://worst-champ.vercel.app',
-  ];
-  const origin = req.headers.get('origin');
-
-  if (origin && allowedOrigins.includes(origin)) {
-    response.headers.set('Access-Control-Allow-Origin', origin);
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
-  }
-  return response;
-}
-
 const sockets = new Map<string, WebSocket>();
 
-async function mainHandler(req: Request) {
-  const url = new URL(req.url);
-  const path = url.pathname;
+const app = new Hono();
+Deno.serve({ port: 8787 }, app.fetch);
 
-  // if (req.method === 'OPTIONS') {
-  //   return addCorsHeaders(req, new Response(null, { status: 204 }));
-  // }
+app.use(
+  '*',
+  cors({
+    origin: ['http://localhost:5173'],
+    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowHeaders: ['Content-Type'],
+  })
+);
 
-  console.log(path);
+app.get('/api/champions', async (c) => {
+  const championsData = await getChampions();
+  return c.json(championsData);
+});
 
-  if (path === '/api/champions') {
-    if (req.method === 'GET') {
-      const championsData = await getChampions();
-      return addCorsHeaders(
-        req,
-        new Response(JSON.stringify(championsData), {
-          headers: { 'Content-Type': 'application/json' },
+app.post('/api/champions/vote', async (c) => {
+  const { championId, clientId } = await c.req.json();
+  const champion = champions.find((item) => item.id === championId);
+
+  if (!champion) {
+    return c.text('Bad champion name', 400);
+  }
+
+  try {
+    await upvoteChampion(champion.id);
+    sockets.forEach((socket) => {
+      socket.send(
+        JSON.stringify({
+          type: 'vote',
+          championId,
+          clientId,
         })
       );
-    }
+    });
+    return c.text('Vote received', 200);
+  } catch (e) {
+    console.error(e);
+    return c.text('Error', 500);
   }
-  if (path === '/api/champions/vote') {
-    if (req.method === 'POST') {
-      const { championId, clientId } = await req.json();
-      const champion = champions.find((item) => item.id === championId);
-      if (!champion)
-        return addCorsHeaders(
-          req,
-          new Response('Bad champion name', { status: 400 })
-        );
+});
 
-      try {
-        await upvoteChampion(champion.id);
-        sockets.forEach((socket) => {
-          socket.send(
-            JSON.stringify({
-              type: 'vote',
-              championId,
-              clientId,
-            })
-          );
-        });
-        return addCorsHeaders(
-          req,
-          new Response('Vote received', { status: 200 })
-        );
-      } catch (e) {
-        console.log(e);
-        return addCorsHeaders(req, new Response('Error', { status: 500 }));
-      }
-    }
+app.get('/socket', (c) => {
+  if (c.req.header('upgrade') !== 'websocket') {
+    return c.text('Endpoint for websockets only', 400);
   }
 
-  if (path === '/socket') {
-    if (req.headers.get('upgrade') !== 'websocket') {
-      return addCorsHeaders(
-        req,
-        new Response('Endpoint for websockets only', { status: 400 })
-      );
-    }
+  const { response, socket } = Deno.upgradeWebSocket(c.req.raw);
+  const socketId = crypto.randomUUID();
 
-    const { socket, response } = Deno.upgradeWebSocket(req);
+  socket.onopen = () => sockets.set(socketId, socket);
+  socket.onclose = () => sockets.delete(socketId);
 
-    const socketId = crypto.randomUUID();
+  return response;
+});
 
-    socket.onopen = () => sockets.set(socketId, socket);
-    socket.onclose = () => sockets.delete(socketId);
-
-    return response;
-  }
-
-  const fileName =
-    url.pathname === '/' ? 'index.html' : url.pathname.substring(1);
-  const fileType = fileName.split('.').at(-1)!;
-  const filePath = url.pathname.startsWith('/imgs')
+app.get('/:file', async (c) => {
+  const fileName = c.req.param('file') || 'index.html';
+  const fileType = fileName.split('.').pop()!;
+  const filePath = fileName.startsWith('imgs/')
     ? fileName
     : `./dist/${fileName}`;
+
   try {
     const file = await Deno.open(filePath, { read: true });
     return new Response(file.readable, {
-      headers: { 'content-type': typeToMime(fileType) },
+      headers: { 'Content-Type': typeToMime(fileType) },
     });
   } catch (e) {
-    console.log(`${filePath}, No such file`);
+    console.error(`${filePath}, No such file`);
+    return c.text('Not Found', 404);
   }
+});
 
-  return addCorsHeaders(req, new Response('Not Found', { status: 404 }));
-}
-
-export function typeToMime(type: string) {
+// Function to map file types to MIME types
+function typeToMime(type: string): string {
   switch (type) {
     case 'html':
       return 'text/html';
     case 'js':
-      return 'text/javascript';
+      return 'application/javascript';
     case 'css':
       return 'text/css';
     case 'png':
