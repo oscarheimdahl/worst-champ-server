@@ -92,13 +92,8 @@ async function mainHandler(req: Request) {
 
     const socketId = crypto.randomUUID();
 
-    socket.onopen = () => {
-      sockets.set(socketId, socket);
-    };
-
-    socket.onclose = () => {
-      sockets.delete(socketId);
-    };
+    socket.onopen = () => sockets.set(socketId, socket);
+    socket.onclose = () => sockets.delete(socketId);
 
     return response;
   }

@@ -101,6 +101,8 @@ export const ChampionList = () => {
     }
   };
 
+  console.log(`🔴`);
+
   return (
     <Reorder.Group
       className={'items-center relative w-full gap-6 py-[300px] flex flex-col'}
@@ -132,7 +134,11 @@ export const ChampionList = () => {
                 className={
                   'pointer-events-none select-none size-full transition-transform scale-[1.05]'
                 }
-                src={`/imgs/${champion.name}.jpg`}
+                src={
+                  import.meta.env.PROD
+                    ? `/imgs/${champion.name}.jpg`
+                    : `@/../../imgs/${champion.name}`
+                }
               />
             </ChampionButton>
           </Reorder.Item>
