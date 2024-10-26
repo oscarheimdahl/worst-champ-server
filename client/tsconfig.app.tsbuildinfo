@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/championbutton.tsx","./src/components/championlist.tsx","./src/utils/env.ts","./src/utils/utils.ts"],"version":"5.6.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/championbutton.tsx","./src/components/championlist.tsx","./src/components/usecustomtoast.tsx","./src/utils/env.ts","./src/utils/utils.ts"],"version":"5.6.3"}

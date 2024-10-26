@@ -1,10 +1,8 @@
-'use client';
-import { toast } from 'sonner';
 import { Reorder } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { Champion } from '../App';
-import { ChampionButton } from './ChampionButton';
 import { apiUrl, socketUrl } from '../utils/env';
+import { ChampionButton } from './ChampionButton';
 import { useCustomToast } from './useCustomToast';
 
 async function upvoteChampion(championId: string, clientId: string) {
@@ -147,13 +145,3 @@ export const ChampionList = () => {
     </Reorder.Group>
   );
 };
-
-function customToast(message: string) {
-  toast.custom(() => (
-    <div className='flex text-white rounded-md w-[354px] p-[1px] bg-white right-0 bg-gradient-to-tr from-[hsl(295,67%,10%)] to-[hsl(30,21%,20%)]'>
-      <div className='size-full p-4 rounded-[5px] bg-[#030312]'>
-        <h1>{message}</h1>
-      </div>
-    </div>
-  ));
-}
