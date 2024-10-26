@@ -9,6 +9,7 @@ initDB();
 const sockets = new Map<string, WebSocket>();
 
 const app = new Hono();
+Deno.serve({ port: 8000 }, app.fetch);
 
 app.get(
   '/socket',
@@ -33,7 +34,6 @@ app.use(
 );
 
 app.get('/api/champions', async (c) => {
-  console.log(`🔴`);
   const championsData = await getChampions();
   return c.json(championsData);
 });
@@ -73,8 +73,6 @@ app.on('GET', ['/', '/*'], async (c) => {
     ? fileName
     : `./dist/${fileName}`;
 
-  console.log(fileName, fileType, filePath);
-
   try {
     const file = await Deno.open(filePath, { read: true });
     const mime = typeToMime(fileType);
@@ -86,8 +84,6 @@ app.on('GET', ['/', '/*'], async (c) => {
     return c.text('Not Found', 404);
   }
 });
-
-Deno.serve({ port: 8000 }, app.fetch);
 
 // Function to map file types to MIME types
 function typeToMime(type: string): string {
