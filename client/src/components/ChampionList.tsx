@@ -14,7 +14,7 @@ async function upvoteChampion(championId: string, clientId: string) {
     body: JSON.stringify({ championId, clientId }),
   });
 
-  if (res.status !== 200) throw new Error('Error');
+  if (res.status !== 200 && res.status !== 429) throw new Error('Error');
 }
 
 function sortChampions(a: Champion, b: Champion) {
@@ -101,6 +101,13 @@ export const ChampionList = () => {
     }
   };
 
+  const lastVoteClick = useRef(0);
+  const handleVoteClick = async (championId: string) => {
+    if (Date.now() - lastVoteClick.current < 1000) return;
+    lastVoteClick.current = Date.now();
+    upvote(championId, true);
+  };
+
   return (
     <Reorder.Group
       className={'items-center relative w-full gap-6 py-[300px] flex flex-col'}
@@ -126,7 +133,7 @@ export const ChampionList = () => {
             </span>
             <ChampionButton
               // className={preventVoteClick ? 'pointer-events-none' : ''}
-              onClick={() => upvote(champion.id, true)}
+              onClick={() => handleVoteClick(champion.id)}
             >
               <img
                 className={
