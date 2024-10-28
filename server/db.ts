@@ -45,10 +45,14 @@ export async function upvoteChampion(championId: string) {
 }
 
 export async function resetVotes() {
+  const promises = [];
   for (const champion of champions) {
-    await kv.set(['champions', champion.id], {
-      ...champion,
-      votes: 0,
-    });
+    promises.push(
+      kv.set(['champions', champion.id], {
+        ...champion,
+        votes: 0,
+      })
+    );
   }
+  await Promise.all(promises);
 }
