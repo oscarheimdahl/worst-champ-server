@@ -140,9 +140,8 @@ export const ChampionList = () => {
                   'pointer-events-none select-none size-full transition-transform scale-[1.05]'
                 }
                 src={
-                  import.meta.env.PROD
-                    ? `/imgs/${champion.name}.jpg`
-                    : `../../imgs/${champion.name}.jpg`
+                  (import.meta.env.PROD ? '' : 'http://localhost:8000') +
+                  `/imgs/${champion.name}.jpg`
                 }
               />
             </ChampionButton>

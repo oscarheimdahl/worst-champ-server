@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, KeyboardEvent, useRef } from 'react';
 import { cn } from '../utils/utils';
 
 interface Symbol {
@@ -6,7 +6,6 @@ interface Symbol {
   endX: number;
   endY: number;
   rotation: number;
-  symbol: string;
 }
 
 const maxEndDist = 120;
@@ -23,6 +22,7 @@ export const ChampionButton = ({
   className?: string;
 }) => {
   const [symbols, setSymbols] = useState<Symbol[]>([]);
+  const [active, setActive] = useState(false);
 
   const spawnSymbol = () => {
     const endPos = randomEndPos();
@@ -36,7 +36,6 @@ export const ChampionButton = ({
         endX: endPos.x,
         endY: endPos.y,
         rotation: rotation,
-        symbol: randomElement(['🖕🏻', '🖕🏼', '🖕🏽', '🖕🏾', '🖕🏿']),
       },
     ]);
 
@@ -45,11 +44,22 @@ export const ChampionButton = ({
     }, floatAnimationDuration);
   };
 
+  const removeActiveTimeout = useRef<number>();
   const handleClick = () => {
+    clearTimeout(removeActiveTimeout.current);
     onClick();
     spawnSymbol();
+    setActive(true);
+    removeActiveTimeout.current = setTimeout(() => setActive(false), 100);
     if (symbols.length > 5) spawnSymbol();
     if (symbols.length > 10) spawnSymbol();
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === ' ' || e.key === 'SpaceBar') {
+      e.preventDefault();
+      handleClick();
+    }
   };
 
   return (
@@ -79,19 +89,22 @@ export const ChampionButton = ({
         );
       })}
       <button
+        onKeyDown={onKeyDown}
         onMouseDown={handleClick}
         className={cn(
           `relative peer rounded-md size-16 flex-none group overflow-hidden transition-all
           outline-white outline-1 hover:scale-125
-            active:translate-y-1`,
+            active:translate-y-1 active:rotate-1`,
+          active && 'translate-y-1',
           className
         )}
       >
         {children}
         <div
-          className={
-            'absolute inset-0 bg-gradient-to-br from-red-600 to-red-900 opacity-0 group-active:opacity-50 transition-opacity'
-          }
+          className={cn(
+            'absolute inset-0 bg-gradient-to-br from-red-600 to-red-900 opacity-0 group-active:opacity-70 transition-opacity',
+            active && 'opacity-50'
+          )}
         ></div>
       </button>
     </>
@@ -105,8 +118,4 @@ function randomEndPos() {
   const x = distance * Math.cos(angle);
   const y = distance * Math.sin(angle);
   return { x, y };
-}
-
-function randomElement<T>(array: T[]) {
-  return array[Math.floor(Math.random() * array.length)];
 }
