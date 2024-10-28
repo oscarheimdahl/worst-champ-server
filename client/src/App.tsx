@@ -20,6 +20,7 @@ export default function App() {
             &nbsp;League&nbsp;of&nbsp;Legends.
           </span>
         </span>
+        <span>The worst champions are moved to the top.</span>
         <span>Order is synced between all visitors.</span>
         <span>You can vote as many times as you want :)</span>
       </div>

@@ -6,7 +6,7 @@ import { Toaster } from 'sonner';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Toaster visibleToasts={1} duration={10000} />
+    <Toaster visibleToasts={1} duration={15000} />
     <App />
   </StrictMode>
 );
