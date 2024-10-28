@@ -63,14 +63,14 @@ app.post('/api/champions/vote', rateLimit, async (c) => {
   }
 });
 
-app.on('GET', ['/', '/*'], async (c) => {
+app.get('/*', async (c) => {
   const requestedFile = new URL(c.req.url).pathname;
   const fileName =
     requestedFile === '/' ? 'index.html' : requestedFile.substring(1);
   const fileType = fileName.split('.').pop()!;
   const filePath = fileName.startsWith('imgs/')
     ? 'server/' + fileName
-    : `./dist/${fileName}`;
+    : `server/dist/${fileName}`;
 
   try {
     const file = await Deno.open(filePath, { read: true });

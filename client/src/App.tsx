@@ -13,10 +13,12 @@ export default function App() {
   useEffect(() => {
     customToast(
       <div className='text-left flex flex-col '>
-        <span className='text-gray-400 italic relative bottom-2'>Welcome!</span>
-        <span> Vote for the worst champion in</span>
-        <span className='text-amber-300 pb-2'>
-          League&nbsp;of&nbsp;Legends.
+        <span className='text-gray-400 italic pb-2'>Welcome!</span>
+        <span className='pb-2'>
+          Vote for the champion you dislike the most in
+          <span className='text-amber-300 pb-2'>
+            &nbsp;League&nbsp;of&nbsp;Legends.
+          </span>
         </span>
         <span>Order is synced between all visitors.</span>
         <span>You can vote as many times as you want :)</span>
