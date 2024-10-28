@@ -43,3 +43,12 @@ export async function upvoteChampion(championId: string) {
     });
   }
 }
+
+export async function resetVotes() {
+  for (const champion of champions) {
+    await kv.set(['champions', champion.id], {
+      ...champion,
+      votes: 0,
+    });
+  }
+}

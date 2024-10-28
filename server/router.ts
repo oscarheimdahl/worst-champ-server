@@ -2,9 +2,10 @@ import { Hono } from 'hono';
 import { upgradeWebSocket } from 'hono/deno';
 import { cors } from 'hono/cors';
 import { champions } from './data/champions.ts';
-import { getChampions, upvoteChampion } from './db.ts';
+import { getChampions, resetVotes, upvoteChampion } from './db.ts';
 import { typeToMime } from './utils.ts';
 import { rateLimit } from './middleware.ts';
+import 'jsr:@std/dotenv/load';
 
 export const app = new Hono();
 
@@ -35,6 +36,22 @@ app.use(
 app.get('/api/champions', async (c) => {
   const championsData = await getChampions();
   return c.json(championsData);
+});
+
+app.post('/api/champions/reset-votes', async (c) => {
+  const body = await c.req.json();
+  const { password } = body;
+  const PASSWORD = Deno.env.get('PASSWORD');
+  if (!PASSWORD || password !== PASSWORD) {
+    return c.text('Not Found', 404);
+  }
+  try {
+    await resetVotes();
+  } catch (e) {
+    console.log(e);
+    return c.text('Unable to reset votes', 500);
+  }
+  return c.body(null, 200);
 });
 
 app.post('/api/champions/vote', rateLimit, async (c) => {
