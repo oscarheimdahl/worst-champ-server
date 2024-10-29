@@ -46,13 +46,18 @@ export const ChampionButton = ({
 
   const removeActiveTimeout = useRef<number>();
   const handleClick = () => {
-    clearTimeout(removeActiveTimeout.current);
     onClick();
+
     spawnSymbol();
-    setActive(true);
-    removeActiveTimeout.current = setTimeout(() => setActive(false), 100);
     if (symbols.length > 5) spawnSymbol();
     if (symbols.length > 10) spawnSymbol();
+
+    clearTimeout(removeActiveTimeout.current);
+    setActive(true);
+    removeActiveTimeout.current = setTimeout(() => setActive(false), 100);
+
+    const sound = new Audio(Math.random() > 0.5 ? '/ashe.ogg' : '/yasuo.ogg');
+    sound.play();
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
