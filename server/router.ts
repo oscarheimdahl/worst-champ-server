@@ -2,7 +2,12 @@ import { Hono } from 'hono';
 import { upgradeWebSocket } from 'hono/deno';
 import { cors } from 'hono/cors';
 import { champions } from './data/champions.ts';
-import { getChampions, resetVotes, upvoteChampion } from './db.ts';
+import {
+  getChampions,
+  getSavedChampions,
+  resetVotes,
+  upvoteChampion,
+} from './db.ts';
 import { typeToMime } from './utils.ts';
 import { rateLimit } from './middleware.ts';
 import 'jsr:@std/dotenv/load';
@@ -36,6 +41,12 @@ app.use(
 app.get('/api/champions', async (c) => {
   const championsData = await getChampions();
   return c.json(championsData);
+});
+
+app.get('/api/saved-champions', async (c) => {
+  const championsDataMap = await getSavedChampions();
+  const championsDataObj = Object.fromEntries(championsDataMap);
+  return c.json(championsDataObj);
 });
 
 app.post('/api/champions/reset-votes', async (c) => {

@@ -56,3 +56,28 @@ export async function resetVotes() {
   }
   await Promise.all(promises);
 }
+
+export async function saveChampions(
+  isoString: string,
+  champions: { name: string; votes: number }[]
+) {
+  await kv.set(['saved-champions', isoString], champions);
+}
+
+export async function deleteAllSavedChampions() {
+  for await (const entry of kv.list({ prefix: ['saved-champions'] })) {
+    await kv.delete(entry.key);
+    console.log(`Deleted key: ${entry.key}`);
+  }
+}
+
+export async function getSavedChampions() {
+  const entries = new Map<string, { name: string; votes: number }[]>();
+  for await (const entry of kv.list({ prefix: ['saved-champions'] })) {
+    entries.set(
+      entry.key.at(1) as string,
+      entry.value as { name: string; votes: number }[]
+    );
+  }
+  return entries;
+}
