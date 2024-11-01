@@ -78,19 +78,20 @@ export const ChampionList = () => {
         })
         .slice()
         .sort(sortChampions);
+
+      // if (castByUser) {
+      //   const orderChanged = !newChampions.every(
+      //     (champion, i) => prevChampions[i].id === champion.id
+      //   );
+      //   if (orderChanged) {
+      //     const sound = new Audio(`/darkharvest.ogg`);
+      //     sound.volume = 0.1;
+      //     sound.playbackRate = 2;
+      //     sound.play();
+      //   }
+      // }
       return newChampions;
     });
-
-    // const orderChanged = !newChampions.every(
-    //   (champion, i) => champions[i].id === champion.id
-    // );
-
-    // if (orderChanged) {
-    //   setPreventVoteClick(true);
-    //   setTimeout(() => {
-    //     setPreventVoteClick(false);
-    //   }, 800);
-    // }
 
     if (!castByUser) return;
     try {
@@ -136,6 +137,7 @@ export const ChampionList = () => {
               onClick={() => handleVoteClick(champion.id)}
             >
               <img
+                loading='lazy'
                 className={
                   'pointer-events-none select-none size-full transition-transform scale-[1.05]'
                 }

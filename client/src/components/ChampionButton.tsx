@@ -55,9 +55,6 @@ export const ChampionButton = ({
     clearTimeout(removeActiveTimeout.current);
     setActive(true);
     removeActiveTimeout.current = setTimeout(() => setActive(false), 100);
-
-    const sound = new Audio(Math.random() > 0.5 ? '/ashe.ogg' : '/yasuo.ogg');
-    sound.play();
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
