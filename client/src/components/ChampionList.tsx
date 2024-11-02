@@ -1,10 +1,11 @@
-import { Reorder } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
-import { apiUrl, socketUrl } from '../utils/env';
+import { Reorder } from 'framer-motion';
+
+import { apiUrl, socketUrl } from '../lib/env';
+import { Champion } from '../types/champion';
 import { ChampionButton } from './ChampionButton';
 import { useCustomToast } from './useCustomToast';
-import { Champion } from '../types/champion';
 
 async function upvoteChampion(championId: string, clientId: string) {
   const res = await fetch(`${apiUrl}/champions/vote`, {
@@ -112,9 +113,9 @@ export const ChampionList = () => {
 
   return (
     <Reorder.Group
-      className={'items-center relative w-full gap-6 py-[300px] flex flex-col'}
-      as='div'
-      axis='y'
+      className={'relative flex w-full flex-col items-center gap-6 py-[300px]'}
+      as="div"
+      axis="y"
       values={champions}
       onReorder={(c) => setChampions(c)}
     >
@@ -124,28 +125,21 @@ export const ChampionList = () => {
             drag={false}
             key={champion.id}
             value={champion}
-            as='div'
+            as="div"
             style={{ zIndex: champion.votes }}
             className={
-              'group relative has-[~div:hover]:opacity-30 peer peer-hover:opacity-30 transition-opacity duration-1000'
+              'group peer relative transition-opacity duration-1000 peer-hover:opacity-30 has-[~div:hover]:opacity-30'
             }
           >
-            <span className={'absolute pointer-events-none sr-only'}>
-              {champion.name.replace('_', ' ')}
-            </span>
+            <span className={'sr-only pointer-events-none absolute'}>{champion.name.replace('_', ' ')}</span>
             <ChampionButton
               // className={preventVoteClick ? 'pointer-events-none' : ''}
               onClick={() => handleVoteClick(champion.id)}
             >
               <img
-                loading='lazy'
-                className={
-                  'pointer-events-none select-none size-full transition-transform scale-[1.05]'
-                }
-                src={
-                  (import.meta.env.PROD ? '' : 'http://localhost:8000') +
-                  `/imgs/${champion.name}.jpg`
-                }
+                loading="lazy"
+                className={'pointer-events-none size-full scale-[1.05] select-none transition-transform'}
+                src={(import.meta.env.PROD ? '' : 'http://localhost:8000') + `/imgs/${champion.name}.jpg`}
               />
             </ChampionButton>
           </Reorder.Item>

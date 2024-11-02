@@ -1,5 +1,6 @@
-import { ReactNode, useState, KeyboardEvent, useRef } from 'react';
-import { cn } from '../utils/utils';
+import { KeyboardEvent, ReactNode, useRef, useState } from 'react';
+
+import { cn } from '@/lib/utils';
 
 interface Symbol {
   id: string;
@@ -44,7 +45,7 @@ export const ChampionButton = ({
     }, floatAnimationDuration);
   };
 
-  const removeActiveTimeout = useRef<number>();
+  const removeActiveTimeout = useRef<NodeJS.Timeout>();
   const handleClick = () => {
     onClick();
 
@@ -70,7 +71,7 @@ export const ChampionButton = ({
         return (
           <div
             key={item.id}
-            className='pointer-events-none absolute left-1/2 bottom-1/2 translate-y-1/2 -translate-x-1/2 text-white'
+            className="pointer-events-none absolute bottom-1/2 left-1/2 -translate-x-1/2 translate-y-1/2 text-white"
           >
             <div
               className={`${
@@ -94,18 +95,16 @@ export const ChampionButton = ({
         onKeyDown={onKeyDown}
         onMouseDown={handleClick}
         className={cn(
-          `relative peer rounded-md size-16 flex-none group overflow-hidden transition-all
-          outline-white outline-1 hover:scale-125
-            active:translate-y-1 active:rotate-1`,
+          `group peer relative size-16 flex-none overflow-hidden rounded-md outline-1 outline-white transition-all hover:scale-125 active:translate-y-1 active:rotate-1`,
           active && 'translate-y-1',
-          className
+          className,
         )}
       >
         {children}
         <div
           className={cn(
-            'absolute inset-0 bg-gradient-to-br from-red-600 to-red-900 opacity-0 group-active:opacity-70 transition-opacity',
-            active && 'opacity-50'
+            'absolute inset-0 bg-gradient-to-br from-red-600 to-red-900 opacity-0 transition-opacity group-active:opacity-70',
+            active && 'opacity-50',
           )}
         ></div>
       </button>

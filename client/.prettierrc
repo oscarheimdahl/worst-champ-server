@@ -1,0 +1,22 @@
+{
+  "singleQuote": true,
+  "semi": true,
+  "jsxSingleQuote": false,
+  "printWidth": 120,
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "tailwindFunctions": ["clsx", "cn", "cva"],
+  "importOrder": [
+    "^(react/(.*)$)|^(react$)",
+    "",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^@/(.*)$",
+    "",
+    "^~/(.*)$",
+    "",
+    "^[./]"
+  ]
+}
