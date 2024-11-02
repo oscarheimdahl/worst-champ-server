@@ -71,7 +71,7 @@ function History() {
       >
         <CardHeader>
           <CardTitle>Worst Champions Over Time</CardTitle>
-          <CardDescription>January - June 2024</CardDescription>
+          <CardDescription>Updated every hour</CardDescription>
         </CardHeader>
         <CardContent>
           <ChartContainer config={{}}>

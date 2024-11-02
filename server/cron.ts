@@ -1,6 +1,6 @@
 import { getChampions, saveChampions } from './db.ts';
 
-const pattern = '0 */2 * * *'; // every two hours
+const pattern = '0 */1 * * *'; // every one hour
 // const pattern = '*/1 * * * *'; // every minute
 export function initSaveChampionVotesCron() {
   Deno.cron('Save votes', pattern, async () => {
