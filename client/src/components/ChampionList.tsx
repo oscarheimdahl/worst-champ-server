@@ -1,9 +1,10 @@
 import { Reorder } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { Champion } from '../App';
+
 import { apiUrl, socketUrl } from '../utils/env';
 import { ChampionButton } from './ChampionButton';
 import { useCustomToast } from './useCustomToast';
+import { Champion } from '../types/champion';
 
 async function upvoteChampion(championId: string, clientId: string) {
   const res = await fetch(`${apiUrl}/champions/vote`, {

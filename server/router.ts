@@ -91,15 +91,24 @@ app.post('/api/champions/vote', rateLimit, async (c) => {
   }
 });
 
+app.on('GET', ['/', '/history'], async () => {
+  console.log(`🔴`);
+  return await returnFile(`server/dist/index.html`, 'html');
+});
+
 app.get('/*', async (c) => {
   const requestedFile = new URL(c.req.url).pathname;
-  const fileName =
-    requestedFile === '/' ? 'index.html' : requestedFile.substring(1);
+  console.log(requestedFile);
+  const fileName = requestedFile.substring(1);
   const fileType = fileName.split('.').pop()!;
   const filePath = fileName.startsWith('imgs/')
     ? 'server/' + fileName
     : `server/dist/${fileName}`;
 
+  return await returnFile(filePath, fileType);
+});
+
+async function returnFile(filePath: string, fileType: string) {
   try {
     const file = await Deno.open(filePath, { read: true });
     const mime = typeToMime(fileType);
@@ -108,6 +117,6 @@ app.get('/*', async (c) => {
     });
   } catch (e) {
     console.error(`${filePath}, No such file`);
-    return c.text('Not Found', 404);
+    return new Response('Not Found', { status: 404 });
   }
-});
+}
